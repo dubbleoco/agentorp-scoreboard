@@ -3,218 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>📎 AgentORP Scoreboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>📎 AgentORP — An AI Trading Agent</title>
+<meta name="description" content="AgentORP is an autonomous AI agent that trades items upward through online marketplaces. Powered by OpenClaw.">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#08080a;--surface:#101014;--surface-2:#161619;--border:#222228;--text:#eeeef0;--text-dim:#77778a;--text-muted:#44444f;--red:#e53935;--red-dim:#e5393518;--red-glow:#e5393530;--green:#00e09e;--green-dim:#00e09e15;--yellow:#ffc107;--yellow-dim:#ffc10715;--blue:#4488ff}
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Source Sans 3',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:24px}
-.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
-.brand{display:flex;align-items:center;gap:12px}
-.brand-icon{font-size:28px;filter:drop-shadow(0 0 12px var(--red-glow))}
-.brand h1{font-family:'Oswald',sans-serif;font-size:32px;font-weight:700;text-transform:uppercase;letter-spacing:3px;color:var(--red)}
-.brand h1 span{text-transform:lowercase}
-.brand-sub{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:2px;margin-top:-2px}
-.status-pill{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;padding:6px 16px;border-radius:4px;display:flex;align-items:center;gap:8px}
-.status-pill.scanning{background:var(--green-dim);color:var(--green);border:1px solid #00e09e30}
-.status-pill.negotiating{background:#4488ff15;color:var(--blue);border:1px solid #4488ff30}
-.status-pill.idle{background:var(--surface-2);color:var(--text-muted);border:1px solid var(--border)}
-.status-pill.awaiting{background:var(--yellow-dim);color:var(--yellow);border:1px solid #ffc10730}
-.status-dot{width:7px;height:7px;border-radius:50%;background:currentColor;animation:blink 2s ease-in-out infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-.score-strip{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:28px 40px;margin-bottom:20px;position:relative;overflow:hidden}
-.score-strip::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--red),var(--green))}
-.score-side{display:flex;flex-direction:column;gap:4px}
-.score-side.right{text-align:right}
-.score-label{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted)}
-.score-item{font-family:'Oswald',sans-serif;font-size:22px;font-weight:600;text-transform:uppercase;letter-spacing:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:400px}
-.score-value{font-family:'JetBrains Mono',monospace;font-size:36px;font-weight:700}
-.score-value.origin{color:var(--text-dim)}
-.score-value.current{color:var(--green)}
-.score-center{display:flex;flex-direction:column;align-items:center;gap:4px;padding:0 40px}
-.score-arrow{font-size:28px;color:var(--red);font-family:'Oswald',sans-serif}
-.score-gain{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--green);background:var(--green-dim);padding:4px 14px;border-radius:4px}
-.score-trades{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px}
-.goal-bar-wrap{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px 24px;margin-bottom:20px}
-.goal-bar-header{display:flex;justify-content:space-between;margin-bottom:8px}
-.goal-bar-label{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted)}
-.goal-bar-pct{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:var(--green)}
-.goal-bar{height:8px;background:var(--surface-2);border-radius:4px;overflow:hidden}
-.goal-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--green));border-radius:4px;transition:width 1s ease;position:relative}
-.goal-fill::after{content:'';position:absolute;right:0;top:-2px;bottom:-2px;width:3px;background:white;border-radius:2px;box-shadow:0 0 8px rgba(255,255,255,.5)}
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
-.mini-stat{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px;text-align:center}
-.mini-stat-val{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700}
-.mini-stat-label{font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);margin-top:4px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:18px 20px}
-.card-title{font-family:'Oswald',sans-serif;font-size:13px;font-weight:500;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
-.card-title .count{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted)}
-.alert{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:6px;margin-bottom:6px;font-size:13px;line-height:1.4;animation:slideIn .3s ease}
-@keyframes slideIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
-.alert.approval{background:var(--yellow-dim);border-left:3px solid var(--yellow)}
-.alert.opportunity{background:var(--green-dim);border-left:3px solid var(--green)}
-.alert.warning{background:#ff660015;border-left:3px solid #ff6600}
-.alert.scam{background:var(--red-dim);border-left:3px solid var(--red)}
-.alert-icon{font-size:15px;flex-shrink:0;margin-top:1px}
-.alert-text{flex:1}
-.alert-time{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);white-space:nowrap;flex-shrink:0}
-.no-alerts{color:var(--text-muted);font-size:13px;text-align:center;padding:20px 0;font-style:italic}
-.chain-node{display:flex;align-items:center;gap:12px;padding:8px 0}
-.chain-num{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:var(--text-muted);width:20px;text-align:center;flex-shrink:0}
-.chain-num.active{color:var(--red)}
-.chain-dot{width:10px;height:10px;border-radius:50%;background:var(--border);flex-shrink:0}
-.chain-dot.active{background:var(--red);box-shadow:0 0 10px var(--red-glow)}
-.chain-dot.origin{background:var(--text-muted)}
-.chain-info{flex:1;display:flex;justify-content:space-between;align-items:center;min-width:0}
-.chain-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.chain-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
-.chain-price{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:var(--green)}
-.chain-pct{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);background:var(--surface-2);padding:2px 6px;border-radius:3px}
-.chain-connector{margin-left:34px;width:1px;height:6px;background:var(--border)}
-.candidate{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px}
-.candidate:last-child{border-bottom:none}
-.candidate-left{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
-.candidate-score{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;width:28px;text-align:center;flex-shrink:0}
-.candidate-score.high{color:var(--green)}
-.candidate-score.mid{color:var(--yellow)}
-.candidate-score.low{color:var(--red)}
-.candidate-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.candidate-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
-.candidate-price{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:var(--green)}
-.candidate-platform{font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:1px;padding:2px 6px;border-radius:3px;background:var(--surface-2);color:var(--text-dim)}
-.activity-item{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid #ffffff06;font-size:12px}
-.activity-item:last-child{border-bottom:none}
-.activity-icon{font-size:12px;flex-shrink:0;margin-top:2px}
-.activity-detail{flex:1;color:var(--text-dim);line-height:1.4}
-.activity-time{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-muted);white-space:nowrap;flex-shrink:0}
-.empty{text-align:center;padding:32px 0;color:var(--text-muted);font-size:13px}
-.empty .big{font-size:32px;margin-bottom:8px;opacity:.3}
-.footer{text-align:center;padding:16px 0;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted)}
-.footer .time{color:var(--text-dim)}
-::-webkit-scrollbar{width:4px}
-::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-@media(max-width:768px){body{padding:12px}.score-strip{grid-template-columns:1fr;padding:20px;gap:16px;text-align:center}.score-side.right{text-align:center}.score-center{padding:8px 0}.grid{grid-template-columns:1fr}.stats-row{grid-template-columns:repeat(2,1fr)}.score-value{font-size:28px}}
+:root{--bg:#08080a;--surface:#101014;--surface-2:#161619;--surface-3:#1c1c21;--border:#222228;--border-light:#2a2a32;--text:#eeeef0;--text-dim:#77778a;--text-muted:#44444f;--red:#e53935;--red-dim:#e5393518;--red-glow:#e5393530;--green:#00e09e;--green-dim:#00e09e15;--yellow:#ffc107;--yellow-dim:#ffc10715;--blue:#4488ff;--blue-dim:#4488ff15}*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Source Sans 3',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}.hero{position:relative;overflow:hidden;border-bottom:1px solid var(--border)}.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% -10%,#e5393512 0%,transparent 70%),radial-gradient(ellipse 60% 50% at 80% 80%,#00e09e08 0%,transparent 60%);pointer-events:none}.hero-grid{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:60px 60px;opacity:.15;mask-image:radial-gradient(ellipse 70% 70% at 50% 40%,black 20%,transparent 70%);-webkit-mask-image:radial-gradient(ellipse 70% 70% at 50% 40%,black 20%,transparent 70%);pointer-events:none}.hero-inner{position:relative;max-width:860px;margin:0 auto;padding:80px 32px 72px;text-align:center}.hero-icon{font-size:56px;margin-bottom:20px;filter:drop-shadow(0 0 24px var(--red-glow));animation:float 4s ease-in-out infinite}@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}.hero-title{font-family:'Oswald',sans-serif;font-size:64px;font-weight:700;text-transform:uppercase;letter-spacing:5px;color:var(--red);margin-bottom:8px;line-height:1}.hero-title span{text-transform:lowercase}.hero-tagline{font-family:'JetBrains Mono',monospace;font-size:14px;letter-spacing:3px;text-transform:uppercase;color:var(--text-muted);margin-bottom:40px}.hero-desc{font-size:20px;line-height:1.7;color:var(--text-dim);max-width:680px;margin:0 auto 40px}.hero-desc strong{color:var(--text);font-weight:600}.hero-cta{display:inline-flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);text-decoration:none;padding:10px 24px;border:1px solid var(--border);border-radius:6px;transition:all .2s}.hero-cta:hover{color:var(--text);border-color:var(--text-dim)}.about{max-width:860px;margin:0 auto;padding:72px 32px}.section-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:20px}.about h2{font-family:'Oswald',sans-serif;font-size:28px;font-weight:600;text-transform:uppercase;letter-spacing:2px;margin-bottom:24px}.about-text{font-size:17px;line-height:1.8;color:var(--text-dim);margin-bottom:20px}.about-text strong{color:var(--text);font-weight:600}.about-text a{color:var(--red);text-decoration:none}.about-text a:hover{text-decoration:underline}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:36px 0}.info-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:22px 20px}.info-card-icon{font-size:24px;margin-bottom:10px}.info-card h3{font-family:'Oswald',sans-serif;font-size:15px;font-weight:500;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px}.info-card p{font-size:14px;line-height:1.6;color:var(--text-dim)}.poc-banner{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--yellow);border-radius:8px;padding:20px 24px;margin:36px 0 0;display:flex;align-items:flex-start;gap:14px}.poc-banner-icon{font-size:22px;flex-shrink:0;margin-top:2px}.poc-banner h3{font-family:'Oswald',sans-serif;font-size:14px;font-weight:500;text-transform:uppercase;letter-spacing:1.5px;color:var(--yellow);margin-bottom:6px}.poc-banner p{font-size:14px;line-height:1.6;color:var(--text-dim)}.divider{border:none;border-top:1px solid var(--border);margin:0}.scoreboard-header{text-align:center;padding:48px 32px 0}.scoreboard-header h2{font-family:'Oswald',sans-serif;font-size:22px;font-weight:500;text-transform:uppercase;letter-spacing:3px;color:var(--text-dim);margin-bottom:6px}.scoreboard-header p{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:1px}.sb-wrap{max-width:1280px;margin:0 auto;padding:24px 24px 0}.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border:1px solid var(--border);border-radius:8px 8px 0 0;background:var(--surface)}.sb-brand{display:flex;align-items:center;gap:10px}.sb-brand-icon{font-size:20px}.sb-brand h2{font-family:'Oswald',sans-serif;font-size:20px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--red)}.sb-brand h2 span{text-transform:lowercase}.sb-right{display:flex;align-items:center;gap:14px}.status-pill{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;padding:4px 12px;border-radius:4px;display:flex;align-items:center;gap:6px}.status-pill.scanning{background:var(--green-dim);color:var(--green);border:1px solid #00e09e30}.status-pill.negotiating{background:var(--blue-dim);color:var(--blue);border:1px solid #4488ff30}.status-pill.idle{background:var(--surface-2);color:var(--text-muted);border:1px solid var(--border)}.status-pill.awaiting{background:var(--yellow-dim);color:var(--yellow);border:1px solid #ffc10730}.status-pill.trading{background:var(--red-dim);color:var(--red);border:1px solid #e5393530}.status-dot{width:5px;height:5px;border-radius:50%;background:currentColor;animation:blink 2s ease-in-out infinite}@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}.live-clock{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted)}.sb-main{display:grid;grid-template-columns:1fr 360px;border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;overflow:hidden;min-height:520px}.sb-left{padding:20px 24px;overflow-y:auto}.score-strip{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:22px 32px;margin-bottom:14px;position:relative;overflow:hidden}.score-strip::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--red),var(--green))}.score-side{display:flex;flex-direction:column;gap:2px}.score-side.right{text-align:right}.score-label{font-family:'JetBrains Mono',monospace;font-size:8px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted)}.score-item{font-family:'Oswald',sans-serif;font-size:18px;font-weight:600;text-transform:uppercase;letter-spacing:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:320px}.score-value{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700}.score-value.origin{color:var(--text-dim)}.score-value.current{color:var(--green)}.score-center{display:flex;flex-direction:column;align-items:center;gap:3px;padding:0 32px}.score-arrow{font-size:20px;color:var(--red);font-family:'Oswald',sans-serif}.score-gain{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:var(--green);background:var(--green-dim);padding:2px 10px;border-radius:4px}.score-trades{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px}.goal-wrap{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 18px;margin-bottom:14px}.goal-header{display:flex;justify-content:space-between;margin-bottom:5px}.goal-label{font-family:'JetBrains Mono',monospace;font-size:8px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted)}.goal-pct{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;color:var(--green)}.goal-bar{height:5px;background:var(--surface-2);border-radius:3px;overflow:hidden}.goal-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--green));border-radius:3px;transition:width 1s ease}.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px}.stat{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px 8px;text-align:center}.stat-val{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700}.stat-label{font-family:'JetBrains Mono',monospace;font-size:7px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);margin-top:2px}.lower-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px}.card-title{font-family:'Oswald',sans-serif;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}.card-title .count{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-muted)}.alert{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:5px;margin-bottom:4px;font-size:12px;line-height:1.4}.alert.approval{background:var(--yellow-dim);border-left:3px solid var(--yellow)}.alert.opportunity{background:var(--green-dim);border-left:3px solid var(--green)}.alert.warning{background:#ff660015;border-left:3px solid #ff6600}.alert.scam{background:var(--red-dim);border-left:3px solid var(--red)}.alert-icon{font-size:13px;flex-shrink:0}.alert-text{flex:1}.alert-time{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--text-muted)}.candidate{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid #ffffff06;font-size:12px}.candidate:last-child{border-bottom:none}.cand-left{display:flex;align-items:center;gap:8px;flex:1;min-width:0}.cand-score{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;width:24px;text-align:center}.cand-score.high{color:var(--green)}.cand-score.mid{color:var(--yellow)}.cand-score.low{color:var(--red)}.cand-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cand-right{display:flex;align-items:center;gap:6px;flex-shrink:0}.cand-price{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--green)}.cand-plat{font-family:'JetBrains Mono',monospace;font-size:7px;text-transform:uppercase;letter-spacing:1px;padding:2px 5px;border-radius:3px;background:var(--surface-2);color:var(--text-dim)}.chain-node{display:flex;align-items:center;gap:8px;padding:6px 0}.chain-num{font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:700;color:var(--text-muted);width:16px;text-align:center}.chain-num.active{color:var(--red)}.chain-dot{width:7px;height:7px;border-radius:50%;background:var(--border)}.chain-dot.active{background:var(--red);box-shadow:0 0 8px var(--red-glow)}.chain-dot.origin{background:var(--text-muted)}.chain-info{flex:1;display:flex;justify-content:space-between;align-items:center}.chain-name{font-size:11px;font-weight:500}.chain-right{display:flex;align-items:center;gap:6px}.chain-price{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;color:var(--green)}.chain-pct{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--text-muted);background:var(--surface-2);padding:1px 4px;border-radius:3px}.chain-connector{margin-left:27px;width:1px;height:3px;background:var(--border)}.no-data{color:var(--text-muted);font-size:11px;text-align:center;padding:14px 0;font-style:italic}.empty{text-align:center;padding:24px 0;color:var(--text-muted);font-size:12px}.empty .big{font-size:24px;margin-bottom:4px;opacity:.3}.sb-right{border-left:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column}.log-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}.log-title{font-family:'Oswald',sans-serif;font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim)}.log-live{font-family:'JetBrains Mono',monospace;font-size:8px;text-transform:uppercase;letter-spacing:1px;color:var(--green);display:flex;align-items:center;gap:5px}.log-live-dot{width:4px;height:4px;border-radius:50%;background:var(--green);animation:blink 1.5s ease-in-out infinite}.log-status{padding:14px 18px;border-bottom:1px solid var(--border);background:var(--bg)}.log-status-label{font-family:'JetBrains Mono',monospace;font-size:8px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);margin-bottom:5px}.log-status-text{font-size:13px;line-height:1.5;color:var(--text-dim)}.log-feed{flex:1;overflow-y:auto}.log-entry{padding:12px 18px;border-bottom:1px solid #ffffff06;transition:background .15s}.log-entry:hover{background:var(--surface-2)}.log-entry-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}.log-entry-type{font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:600;text-transform:uppercase;letter-spacing:1px;padding:2px 7px;border-radius:3px}.log-entry-type.scan{background:var(--blue-dim);color:var(--blue)}.log-entry-type.message{background:#8855ff15;color:#8855ff}.log-entry-type.trade{background:var(--green-dim);color:var(--green)}.log-entry-type.list{background:#ff660015;color:#ff6600}.log-entry-type.alert{background:var(--yellow-dim);color:var(--yellow)}.log-entry-type.system{background:var(--red-dim);color:var(--red)}.log-entry-time{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--text-muted)}.log-entry-text{font-size:13px;line-height:1.5;color:var(--text)}.log-entry-platform{font-family:'JetBrains Mono',monospace;font-size:8px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-top:3px}.sb-footer{text-align:center;padding:14px 0 40px;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-muted)}.page-footer{text-align:center;padding:48px 32px 56px;border-top:1px solid var(--border)}.page-footer p{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);line-height:1.8}.page-footer a{color:var(--text-dim);text-decoration:none}.page-footer a:hover{color:var(--red)}@media(max-width:900px){.hero-title{font-size:44px}.hero-desc{font-size:17px}.cards{grid-template-columns:1fr}.sb-main{grid-template-columns:1fr}.sb-right{border-left:none;border-top:1px solid var(--border);max-height:420px}.score-strip{grid-template-columns:1fr;padding:18px;gap:12px;text-align:center}.score-side.right{text-align:center}.score-center{padding:6px 0}.stats{grid-template-columns:repeat(3,1fr)}.lower-grid{grid-template-columns:1fr}}@media(max-width:600px){.hero-inner{padding:56px 20px 48px}.hero-title{font-size:36px;letter-spacing:3px}.about{padding:48px 20px}.sb-wrap{padding:16px 12px 0}.stats{grid-template-columns:repeat(2,1fr)}}::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 </style>
 </head>
 <body>
-<div class="header">
-<div class="brand">
-<div class="brand-icon">📎</div>
-<div>
-<h1>A<span>gent</span>ORP</h1>
-<div class="brand-sub">Scoreboard</div>
-</div>
-</div>
-<div class="status-pill idle" id="statusPill">
-<div class="status-dot"></div>
-<span id="statusText">Idle</span>
-</div>
-</div>
-<div class="score-strip">
-<div class="score-side">
-<div class="score-label">Started With</div>
-<div class="score-item" id="originItem">—</div>
-<div class="score-value origin" id="originValue">$0</div>
-</div>
-<div class="score-center">
-<div class="score-arrow">→</div>
-<div class="score-gain" id="totalGain">+0%</div>
-<div class="score-trades" id="tradeCount">0 trades</div>
-</div>
-<div class="score-side right">
-<div class="score-label">Current Item</div>
-<div class="score-item" id="currentItem">—</div>
-<div class="score-value current" id="currentValue">$0</div>
-</div>
-</div>
-<div class="goal-bar-wrap">
-<div class="goal-bar-header">
-<div class="goal-bar-label">Progress to Goal</div>
-<div class="goal-bar-pct"><span id="goalPct">0</span>% → $<span id="goalValue">0</span></div>
-</div>
-<div class="goal-bar"><div class="goal-fill" id="goalFill" style="width:0%"></div></div>
-</div>
-<div class="stats-row">
-<div class="mini-stat"><div class="mini-stat-val" id="statTrades">0</div><div class="mini-stat-label">Trades</div></div>
-<div class="mini-stat"><div class="mini-stat-val" id="statMessages">0</div><div class="mini-stat-label">Messages</div></div>
-<div class="mini-stat"><div class="mini-stat-val" id="statDaysHeld">0</div><div class="mini-stat-label">Days on Current</div></div>
-<div class="mini-stat"><div class="mini-stat-val" id="statListings">0</div><div class="mini-stat-label">Active Listings</div></div>
-</div>
-<div class="grid">
-<div class="card">
-<div class="card-title">Alerts<span class="count" id="alertCount">0</span></div>
-<div id="alertsContainer"><div class="no-alerts">No alerts — AgentORP is quiet</div></div>
-</div>
-<div class="card">
-<div class="card-title">Top Candidates<span class="count" id="candidateCount">0</span></div>
-<div id="candidatesContainer"><div class="no-alerts">No candidates yet</div></div>
-</div>
-</div>
-<div class="grid">
-<div class="card">
-<div class="card-title">Trade Chain</div>
-<div id="chainContainer"><div class="empty"><div class="big">📎</div>Waiting for first item...</div></div>
-</div>
-<div class="card" style="max-height:400px;overflow-y:auto">
-<div class="card-title">Recent Activity<span class="count" id="activityCount">0</span></div>
-<div id="activityContainer"><div class="no-alerts">No activity yet</div></div>
-</div>
-</div>
-<div class="footer">Last updated: <span class="time" id="lastUpdated">never</span> · Auto-refreshes every 30s</div>
-
+<section class="hero"><div class="hero-bg"></div><div class="hero-grid"></div><div class="hero-inner"><div class="hero-icon">📎</div><h1 class="hero-title">A<span>gent</span>ORP</h1><div class="hero-tagline">Trade up or trade out</div><p class="hero-desc">An <strong>autonomous AI agent</strong> that starts with a single item and trades its way up through online marketplaces — scanning listings, messaging sellers, negotiating deals, and executing trades — <strong>all on its own.</strong></p><a href="#scoreboard" class="hero-cta">↓ Live Scoreboard</a></div></section>
+<section class="about"><div class="section-label">What is this?</div><h2>The Experiment</h2><p class="about-text">In 2005, Kyle MacDonald started with a single red paperclip and traded it — one swap at a time — all the way up to a house. <strong>AgentORP is the AI version of that experiment.</strong> It takes a starting item, sets a goal value, and autonomously works to get there through a series of trades on real marketplaces like Facebook Marketplace, Craigslist, OfferUp, and Mercari.</p><p class="about-text">It's not a bot that just scrapes data. AgentORP <strong>thinks, plans, and acts.</strong> It searches for undervalued items. It estimates fair market value using sold listings across platforms. It writes listing descriptions, sends messages to real people, negotiates prices, and proposes trades. It knows when to push for a better deal and when to walk away.</p><div class="cards"><div class="info-card"><div class="info-card-icon">🔍</div><h3>Scans</h3><p>Searches multiple marketplaces simultaneously, filters by location and value range, and scores every candidate on resale potential and demand.</p></div><div class="info-card"><div class="info-card-icon">🤝</div><h3>Negotiates</h3><p>Messages sellers in natural language, proposes trades or cash offers, handles counter-offers, and knows when to walk away from a bad deal.</p></div><div class="info-card"><div class="info-card-icon">📈</div><h3>Trades Up</h3><p>Every trade targets at least a 20% gain in value. The chain builds one swap at a time, turning something small into something big.</p></div></div><div class="section-label" style="margin-top:48px">How it works</div><h2>Powered by OpenClaw</h2><p class="about-text">Under the hood, AgentORP runs on <a href="https://openclaw.ai" target="_blank">OpenClaw</a> — an open-source AI agent gateway that connects large language models to real tools like web browsers, messaging platforms, and file systems. OpenClaw gives the AI a persistent identity, memory, and the ability to take actions in the real world.</p><p class="about-text">Think of OpenClaw as the operating system, and AgentORP as an app that runs on it. OpenClaw handles the infrastructure — routing messages from Telegram, managing browser sessions, keeping memory between conversations — while AgentORP's custom skills and instructions handle the marketplace strategy.</p><p class="about-text">The agent runs on a local machine, communicates via Telegram, browses the web through a real browser, and pushes live updates to this scoreboard.</p><div class="poc-banner"><div class="poc-banner-icon">🧪</div><div><h3>Proof of Concept</h3><p>AgentORP is an experiment in what autonomous AI agents can do today. It's not a commercial product — it's a hands-on exploration of giving an AI real-world agency: browsing the web, talking to strangers, making decisions about value, and executing trades. Some things will work great. Some won't. That's the point. The scoreboard below shows the live results, whatever they are — wins, losses, and everything in between.</p></div></div></section>
+<hr class="divider" id="scoreboard">
+<div class="scoreboard-header"><h2>Live Scoreboard</h2><p>Updates every 30 seconds from the agent</p></div>
+<div class="sb-wrap"><div class="topbar"><div class="sb-brand"><div class="sb-brand-icon">📎</div><h2>A<span>gent</span>ORP</h2></div><div class="sb-right"><div class="status-pill idle" id="statusPill"><div class="status-dot"></div><span id="statusText">Idle</span></div><div class="live-clock" id="clock">--:--:--</div></div></div><div class="sb-main"><div class="sb-left"><div class="score-strip"><div class="score-side"><div class="score-label">Started With</div><div class="score-item" id="originItem">—</div><div class="score-value origin" id="originValue">$0</div></div><div class="score-center"><div class="score-arrow">→</div><div class="score-gain" id="totalGain">+0%</div><div class="score-trades" id="tradeCount">0 trades</div></div><div class="score-side right"><div class="score-label">Current Item</div><div class="score-item" id="currentItem">—</div><div class="score-value current" id="currentValue">$0</div></div></div><div class="goal-wrap"><div class="goal-header"><div class="goal-label">Progress to Goal</div><div class="goal-pct"><span id="goalPct">0</span>% → $<span id="goalValue">0</span></div></div><div class="goal-bar"><div class="goal-fill" id="goalFill" style="width:0%"></div></div></div><div class="stats"><div class="stat"><div class="stat-val" id="sT">0</div><div class="stat-label">Trades</div></div><div class="stat"><div class="stat-val" id="sM">0</div><div class="stat-label">Messages</div></div><div class="stat"><div class="stat-val" id="sD">0</div><div class="stat-label">Days Held</div></div><div class="stat"><div class="stat-val" id="sL">0</div><div class="stat-label">Listings</div></div><div class="stat"><div class="stat-val" id="sC">0</div><div class="stat-label">Candidates</div></div></div><div class="lower-grid"><div class="card"><div class="card-title">Alerts <span class="count" id="aC">0</span></div><div id="aBox"><div class="no-data">No alerts — AgentORP is quiet</div></div></div><div class="card"><div class="card-title">Top Candidates <span class="count" id="cC">0</span></div><div id="cBox"><div class="no-data">No candidates yet</div></div></div><div class="card"><div class="card-title">Trade Chain</div><div id="chBox"><div class="empty"><div class="big">📎</div>Waiting for first item...</div></div></div><div class="card"><div class="card-title">Listed On</div><div id="plBox"><div class="no-data">No active listings</div></div></div></div></div><div class="sb-right"><div class="log-header"><div class="log-title">Live Feed</div><div class="log-live"><div class="log-live-dot"></div> Live</div></div><div class="log-status"><div class="log-status-label">What's happening</div><div class="log-status-text" id="statusMsg">AgentORP is idle. Give it a starting item and a goal to kick things off.</div></div><div class="log-feed" id="logFeed"><div class="log-entry"><div class="log-entry-header"><div class="log-entry-type system">Ready</div><div class="log-entry-time">now</div></div><div class="log-entry-text">AgentORP is online and waiting for a starting item. Once it has one, it'll start scanning marketplaces in the Chelsea, Michigan area for trade-up opportunities.</div></div></div></div></div><div class="sb-footer">Last updated: <span id="lastUp">never</span> · Auto-refreshes every 30s</div></div>
+<section class="page-footer"><p>Built by <a href="https://github.com/dubbleoco" target="_blank">dubbleoco</a> · Powered by <a href="https://openclaw.ai" target="_blank">OpenClaw</a> + Claude<br>A proof-of-concept experiment in autonomous AI agents, 2026</p></section>
 <script>
-const POLL_INTERVAL=30000;
-const ALERT_ICONS={approval:'⚡',opportunity:'🎯',warning:'⚠️',scam:'🚫'};
-const ACTIVITY_ICONS={scan:'🔍',message:'💬',list:'📋',trade:'🤝',alert:'⚡'};
-const STATUS_CLASSES={scanning:'scanning',negotiating:'negotiating',idle:'idle',awaiting_approval:'awaiting'};
-
-function render(d){
-const pill=document.getElementById('statusPill');
-pill.className='status-pill '+(STATUS_CLASSES[d.status]||'idle');
-document.getElementById('statusText').textContent=(d.status||'idle').replace('_',' ');
-const chain=d.chain||[];
-const origin=chain[0];
-const current=chain[chain.length-1];
-if(origin){document.getElementById('originItem').textContent=origin.item;document.getElementById('originValue').textContent='$'+origin.value}
-if(current&&d.current){document.getElementById('currentItem').textContent=d.current.item;document.getElementById('currentValue').textContent='$'+d.current.value}
-document.getElementById('totalGain').textContent='+'+(d.total_gain_pct||0)+'%';
-document.getElementById('tradeCount').textContent=(d.trades_completed||0)+' trades';
-const goal=d.goal||1;const cv=d.current?d.current.value:0;
-const pct=Math.min(100,Math.round((cv/goal)*100));
-document.getElementById('goalPct').textContent=pct;
-document.getElementById('goalValue').textContent=goal;
-document.getElementById('goalFill').style.width=pct+'%';
-document.getElementById('statTrades').textContent=d.trades_completed||0;
-document.getElementById('statMessages').textContent=d.messages_sent||0;
-document.getElementById('statDaysHeld').textContent=d.current?(d.current.days_held||0):0;
-document.getElementById('statListings').textContent=d.current&&d.current.listed_on?d.current.listed_on.length:0;
-const alerts=d.alerts||[];
-document.getElementById('alertCount').textContent=alerts.length;
-const aEl=document.getElementById('alertsContainer');
-if(!alerts.length){aEl.innerHTML='<div class="no-alerts">No alerts — AgentORP is quiet</div>'}
-else{aEl.innerHTML=alerts.map(a=>{const ic=ALERT_ICONS[a.type]||'📌';const t=a.time?new Date(a.time).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}):'';return'<div class="alert '+a.type+'"><span class="alert-icon">'+ic+'</span><span class="alert-text">'+a.message+'</span><span class="alert-time">'+t+'</span></div>'}).join('')}
-const cands=d.candidates||[];
-document.getElementById('candidateCount').textContent=cands.length;
-const cEl=document.getElementById('candidatesContainer');
-if(!cands.length){cEl.innerHTML='<div class="no-alerts">No candidates yet</div>'}
-else{cEl.innerHTML=cands.map(c=>{const sc=c.score>=80?'high':c.score>=60?'mid':'low';return'<div class="candidate"><div class="candidate-left"><div class="candidate-score '+sc+'">'+c.score+'</div><div class="candidate-name">'+c.item+'</div></div><div class="candidate-right"><div class="candidate-price">$'+c.price+'</div><div class="candidate-platform">'+c.platform+'</div></div></div>'}).join('')}
-const chEl=document.getElementById('chainContainer');
-if(!chain.length){chEl.innerHTML='<div class="empty"><div class="big">📎</div>Waiting for first item...</div>'}
-else{chEl.innerHTML=chain.map((t,i)=>{const isA=i===chain.length-1;const isO=i===0;const dc=isA?'active':isO?'origin':'';const nc=isA?'active':'';const conn=i<chain.length-1?'<div class="chain-connector"></div>':'';return'<div class="chain-node"><div class="chain-num '+nc+'">#'+t.number+'</div><div class="chain-dot '+dc+'"></div><div class="chain-info"><div class="chain-name">'+t.item+'</div><div class="chain-right"><div class="chain-price">$'+t.value+'</div>'+(t.gain_pct>0?'<div class="chain-pct">+'+t.gain_pct+'%</div>':'')+'</div></div></div>'+conn}).join('')}
-const acts=d.activity||[];
-document.getElementById('activityCount').textContent=acts.length;
-const actEl=document.getElementById('activityContainer');
-if(!acts.length){actEl.innerHTML='<div class="no-alerts">No activity yet</div>'}
-else{actEl.innerHTML=acts.map(a=>{const ic=ACTIVITY_ICONS[a.action]||'•';const t=a.time?new Date(a.time).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}):'';return'<div class="activity-item"><span class="activity-icon">'+ic+'</span><span class="activity-detail">'+a.detail+(a.platform?' <span style="color:var(--text-muted)">· '+a.platform+'</span>':'')+'</span><span class="activity-time">'+t+'</span></div>'}).join('')}
-document.getElementById('lastUpdated').textContent=d.updated?new Date(d.updated).toLocaleString():'never';
-}
-
-async function poll(){
-try{const r=await fetch('scoreboard.json?t='+Date.now());if(r.ok){const d=await r.json();render(d)}}catch(e){}
-}
-poll();
-setInterval(poll,POLL_INTERVAL);
+function tick(){document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-US',{hour12:false});requestAnimationFrame(()=>setTimeout(tick,1000))}tick();
+const POLL=30000,A_IC={approval:'⚡',opportunity:'🎯',warning:'⚠️',scam:'🚫'},ST_CL={scanning:'scanning',negotiating:'negotiating',idle:'idle',awaiting_approval:'awaiting',trading:'trading'};
+function render(d){var pill=document.getElementById('statusPill');pill.className='status-pill '+(ST_CL[d.status]||'idle');document.getElementById('statusText').textContent=(d.status||'idle').replace(/_/g,' ');var ch=d.chain||[];if(ch[0]){document.getElementById('originItem').textContent=ch[0].item;document.getElementById('originValue').textContent='$'+ch[0].value}if(d.current){document.getElementById('currentItem').textContent=d.current.item;document.getElementById('currentValue').textContent='$'+d.current.value}document.getElementById('totalGain').textContent='+'+(d.total_gain_pct||0)+'%';document.getElementById('tradeCount').textContent=(d.trades_completed||0)+' trade'+(d.trades_completed!==1?'s':'');var g=d.goal||1,cv=d.current?d.current.value:0,pct=Math.min(100,Math.round(cv/g*100));document.getElementById('goalPct').textContent=pct;document.getElementById('goalValue').textContent=g;document.getElementById('goalFill').style.width=pct+'%';document.getElementById('sT').textContent=d.trades_completed||0;document.getElementById('sM').textContent=d.messages_sent||0;document.getElementById('sD').textContent=d.current?(d.current.days_held||0):0;document.getElementById('sL').textContent=d.current&&d.current.listed_on?d.current.listed_on.length:0;document.getElementById('sC').textContent=(d.candidates||[]).length;var al=d.alerts||[];document.getElementById('aC').textContent=al.length;document.getElementById('aBox').innerHTML=al.length?al.map(function(a){return'<div class="alert '+(a.type||'warning')+'"><span class="alert-icon">'+(A_IC[a.type]||'📌')+'</span><span class="alert-text">'+a.message+'</span><span class="alert-time">'+(a.time?new Date(a.time).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}):'')+'</span></div>'}).join(''):'<div class="no-data">No alerts — AgentORP is quiet</div>';var ca=d.candidates||[];document.getElementById('cC').textContent=ca.length;document.getElementById('cBox').innerHTML=ca.length?ca.map(function(c){return'<div class="candidate"><div class="cand-left"><div class="cand-score '+(c.score>=80?'high':c.score>=60?'mid':'low')+'">'+c.score+'</div><div class="cand-name">'+c.item+'</div></div><div class="cand-right"><div class="cand-price">$'+c.price+'</div><div class="cand-plat">'+c.platform+'</div></div></div>'}).join(''):'<div class="no-data">No candidates yet</div>';document.getElementById('chBox').innerHTML=ch.length?ch.map(function(t,i){var isA=i===ch.length-1,isO=i===0;return'<div class="chain-node"><div class="chain-num '+(isA?'active':'')+'">'+t.number+'</div><div class="chain-dot '+(isA?'active':isO?'origin':'')+'"></div><div class="chain-info"><div class="chain-name">'+t.item+'</div><div class="chain-right"><div class="chain-price">$'+t.value+'</div>'+(t.gain_pct>0?'<div class="chain-pct">+'+t.gain_pct+'%</div>':'')+'</div></div></div>'+(i<ch.length-1?'<div class="chain-connector"></div>':'')}).join(''):'<div class="empty"><div class="big">📎</div>Waiting for first item...</div>';var plEl=document.getElementById('plBox');if(d.current&&d.current.listed_on&&d.current.listed_on.length){plEl.innerHTML=d.current.listed_on.map(function(p){return'<div style="display:inline-block;font-family:JetBrains Mono,monospace;font-size:10px;padding:5px 12px;margin:2px;border-radius:4px;background:var(--surface-2);border:1px solid var(--border);color:var(--text-dim);">'+p+'</div>'}).join('')}else{plEl.innerHTML='<div class="no-data">No active listings</div>'}var acts=d.activity||[],logEl=document.getElementById('logFeed');if(acts.length){logEl.innerHTML=acts.map(function(a){var t=a.time?new Date(a.time).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}):'';return'<div class="log-entry"><div class="log-entry-header"><div class="log-entry-type '+(a.action||'system')+'">'+(a.action||'update')+'</div><div class="log-entry-time">'+t+'</div></div><div class="log-entry-text">'+a.detail+'</div>'+(a.platform?'<div class="log-entry-platform">'+a.platform+'</div>':'')+'</div>'}).join('')}if(d.status_message)document.getElementById('statusMsg').textContent=d.status_message;document.getElementById('lastUp').textContent=d.updated?new Date(d.updated).toLocaleString():'never'}
+async function poll(){try{var r=await fetch('scoreboard.json?t='+Date.now());if(r.ok)render(await r.json())}catch(e){}}poll();setInterval(poll,POLL);
 </script>
 </body>
 </html>
