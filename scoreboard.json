@@ -1,0 +1,13 @@
+{
+  "updated": null,
+  "status": "idle",
+  "chain": [],
+  "current": null,
+  "goal": 0,
+  "total_gain_pct": 0,
+  "trades_completed": 0,
+  "messages_sent": 0,
+  "candidates": [],
+  "alerts": [],
+  "activity": []
+}
