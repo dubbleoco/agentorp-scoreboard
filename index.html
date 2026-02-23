@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📎 AgentORP Scoreboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#08080a;--surface:#101014;--surface-2:#161619;--border:#222228;--text:#eeeef0;--text-dim:#77778a;--text-muted:#44444f;--red:#e53935;--red-dim:#e5393518;--red-glow:#e5393530;--green:#00e09e;--green-dim:#00e09e15;--yellow:#ffc107;--yellow-dim:#ffc10715;--blue:#4488ff}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Source Sans 3',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:24px}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-icon{font-size:28px;filter:drop-shadow(0 0 12px var(--red-glow))}
+.brand h1{font-family:'Oswald',sans-serif;font-size:32px;font-weight:700;text-transform:uppercase;letter-spacing:3px;color:var(--red)}
+.brand h1 span{text-transform:lowercase}
+.brand-sub{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:2px;margin-top:-2px}
+.status-pill{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;padding:6px 16px;border-radius:4px;display:flex;align-items:center;gap:8px}
+.status-pill.scanning{background:var(--green-dim);color:var(--green);border:1px solid #00e09e30}
+.status-pill.negotiating{background:#4488ff15;color:var(--blue);border:1px solid #4488ff30}
+.status-pill.idle{background:var(--surface-2);color:var(--text-muted);border:1px solid var(--border)}
+.status-pill.awaiting{background:var(--yellow-dim);color:var(--yellow);border:1px solid #ffc10730}
+.status-dot{width:7px;height:7px;border-radius:50%;background:currentColor;animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.score-strip{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:28px 40px;margin-bottom:20px;position:relative;overflow:hidden}
+.score-strip::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--red),var(--green))}
+.score-side{display:flex;flex-direction:column;gap:4px}
+.score-side.right{text-align:right}
+.score-label{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted)}
+.score-item{font-family:'Oswald',sans-serif;font-size:22px;font-weight:600;text-transform:uppercase;letter-spacing:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:400px}
+.score-value{font-family:'JetBrains Mono',monospace;font-size:36px;font-weight:700}
+.score-value.origin{color:var(--text-dim)}
+.score-value.current{color:var(--green)}
+.score-center{display:flex;flex-direction:column;align-items:center;gap:4px;padding:0 40px}
+.score-arrow{font-size:28px;color:var(--red);font-family:'Oswald',sans-serif}
+.score-gain{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--green);background:var(--green-dim);padding:4px 14px;border-radius:4px}
+.score-trades{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px}
+.goal-bar-wrap{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px 24px;margin-bottom:20px}
+.goal-bar-header{display:flex;justify-content:space-between;margin-bottom:8px}
+.goal-bar-label{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted)}
+.goal-bar-pct{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:var(--green)}
+.goal-bar{height:8px;background:var(--surface-2);border-radius:4px;overflow:hidden}
+.goal-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--green));border-radius:4px;transition:width 1s ease;position:relative}
+.goal-fill::after{content:'';position:absolute;right:0;top:-2px;bottom:-2px;width:3px;background:white;border-radius:2px;box-shadow:0 0 8px rgba(255,255,255,.5)}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.mini-stat{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px;text-align:center}
+.mini-stat-val{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700}
+.mini-stat-label{font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);margin-top:4px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:18px 20px}
+.card-title{font-family:'Oswald',sans-serif;font-size:13px;font-weight:500;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+.card-title .count{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted)}
+.alert{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:6px;margin-bottom:6px;font-size:13px;line-height:1.4;animation:slideIn .3s ease}
+@keyframes slideIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+.alert.approval{background:var(--yellow-dim);border-left:3px solid var(--yellow)}
+.alert.opportunity{background:var(--green-dim);border-left:3px solid var(--green)}
+.alert.warning{background:#ff660015;border-left:3px solid #ff6600}
+.alert.scam{background:var(--red-dim);border-left:3px solid var(--red)}
+.alert-icon{font-size:15px;flex-shrink:0;margin-top:1px}
+.alert-text{flex:1}
+.alert-time{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);white-space:nowrap;flex-shrink:0}
+.no-alerts{color:var(--text-muted);font-size:13px;text-align:center;padding:20px 0;font-style:italic}
+.chain-node{display:flex;align-items:center;gap:12px;padding:8px 0}
+.chain-num{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:var(--text-muted);width:20px;text-align:center;flex-shrink:0}
+.chain-num.active{color:var(--red)}
+.chain-dot{width:10px;height:10px;border-radius:50%;background:var(--border);flex-shrink:0}
+.chain-dot.active{background:var(--red);box-shadow:0 0 10px var(--red-glow)}
+.chain-dot.origin{background:var(--text-muted)}
+.chain-info{flex:1;display:flex;justify-content:space-between;align-items:center;min-width:0}
+.chain-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chain-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.chain-price{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:var(--green)}
+.chain-pct{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);background:var(--surface-2);padding:2px 6px;border-radius:3px}
+.chain-connector{margin-left:34px;width:1px;height:6px;background:var(--border)}
+.candidate{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px}
+.candidate:last-child{border-bottom:none}
+.candidate-left{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+.candidate-score{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;width:28px;text-align:center;flex-shrink:0}
+.candidate-score.high{color:var(--green)}
+.candidate-score.mid{color:var(--yellow)}
+.candidate-score.low{color:var(--red)}
+.candidate-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.candidate-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.candidate-price{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:var(--green)}
+.candidate-platform{font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:1px;padding:2px 6px;border-radius:3px;background:var(--surface-2);color:var(--text-dim)}
+.activity-item{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid #ffffff06;font-size:12px}
+.activity-item:last-child{border-bottom:none}
+.activity-icon{font-size:12px;flex-shrink:0;margin-top:2px}
+.activity-detail{flex:1;color:var(--text-dim);line-height:1.4}
+.activity-time{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-muted);white-space:nowrap;flex-shrink:0}
+.empty{text-align:center;padding:32px 0;color:var(--text-muted);font-size:13px}
+.empty .big{font-size:32px;margin-bottom:8px;opacity:.3}
+.footer{text-align:center;padding:16px 0;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted)}
+.footer .time{color:var(--text-dim)}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+@media(max-width:768px){body{padding:12px}.score-strip{grid-template-columns:1fr;padding:20px;gap:16px;text-align:center}.score-side.right{text-align:center}.score-center{padding:8px 0}.grid{grid-template-columns:1fr}.stats-row{grid-template-columns:repeat(2,1fr)}.score-value{font-size:28px}}
+</style>
+</head>
+<body>
+<div class="header">
+<div class="brand">
+<div class="brand-icon">📎</div>
+<div>
+<h1>A<span>gent</span>ORP</h1>
+<div class="brand-sub">Scoreboard</div>
+</div>
+</div>
+<div class="status-pill idle" id="statusPill">
+<div class="status-dot"></div>
+<span id="statusText">Idle</span>
+</div>
+</div>
+<div class="score-strip">
+<div class="score-side">
+<div class="score-label">Started With</div>
+<div class="score-item" id="originItem">—</div>
+<div class="score-value origin" id="originValue">$0</div>
+</div>
+<div class="score-center">
+<div class="score-arrow">→</div>
+<div class="score-gain" id="totalGain">+0%</div>
+<div class="score-trades" id="tradeCount">0 trades</div>
+</div>
+<div class="score-side right">
+<div class="score-label">Current Item</div>
+<div class="score-item" id="currentItem">—</div>
+<div class="score-value current" id="currentValue">$0</div>
+</div>
+</div>
+<div class="goal-bar-wrap">
+<div class="goal-bar-header">
+<div class="goal-bar-label">Progress to Goal</div>
+<div class="goal-bar-pct"><span id="goalPct">0</span>% → $<span id="goalValue">0</span></div>
+</div>
+<div class="goal-bar"><div class="goal-fill" id="goalFill" style="width:0%"></div></div>
+</div>
+<div class="stats-row">
+<div class="mini-stat"><div class="mini-stat-val" id="statTrades">0</div><div class="mini-stat-label">Trades</div></div>
+<div class="mini-stat"><div class="mini-stat-val" id="statMessages">0</div><div class="mini-stat-label">Messages</div></div>
+<div class="mini-stat"><div class="mini-stat-val" id="statDaysHeld">0</div><div class="mini-stat-label">Days on Current</div></div>
+<div class="mini-stat"><div class="mini-stat-val" id="statListings">0</div><div class="mini-stat-label">Active Listings</div></div>
+</div>
+<div class="grid">
+<div class="card">
+<div class="card-title">Alerts<span class="count" id="alertCount">0</span></div>
+<div id="alertsContainer"><div class="no-alerts">No alerts — AgentORP is quiet</div></div>
+</div>
+<div class="card">
+<div class="card-title">Top Candidates<span class="count" id="candidateCount">0</span></div>
+<div id="candidatesContainer"><div class="no-alerts">No candidates yet</div></div>
+</div>
+</div>
+<div class="grid">
+<div class="card">
+<div class="card-title">Trade Chain</div>
+<div id="chainContainer"><div class="empty"><div class="big">📎</div>Waiting for first item...</div></div>
+</div>
+<div class="card" style="max-height:400px;overflow-y:auto">
+<div class="card-title">Recent Activity<span class="count" id="activityCount">0</span></div>
+<div id="activityContainer"><div class="no-alerts">No activity yet</div></div>
+</div>
+</div>
+<div class="footer">Last updated: <span class="time" id="lastUpdated">never</span> · Auto-refreshes every 30s</div>
+
+<script>
+const POLL_INTERVAL=30000;
+const ALERT_ICONS={approval:'⚡',opportunity:'🎯',warning:'⚠️',scam:'🚫'};
+const ACTIVITY_ICONS={scan:'🔍',message:'💬',list:'📋',trade:'🤝',alert:'⚡'};
+const STATUS_CLASSES={scanning:'scanning',negotiating:'negotiating',idle:'idle',awaiting_approval:'awaiting'};
+
+function render(d){
+const pill=document.getElementById('statusPill');
+pill.className='status-pill '+(STATUS_CLASSES[d.status]||'idle');
+document.getElementById('statusText').textContent=(d.status||'idle').replace('_',' ');
+const chain=d.chain||[];
+const origin=chain[0];
+const current=chain[chain.length-1];
+if(origin){document.getElementById('originItem').textContent=origin.item;document.getElementById('originValue').textContent='$'+origin.value}
+if(current&&d.current){document.getElementById('currentItem').textContent=d.current.item;document.getElementById('currentValue').textContent='$'+d.current.value}
+document.getElementById('totalGain').textContent='+'+(d.total_gain_pct||0)+'%';
+document.getElementById('tradeCount').textContent=(d.trades_completed||0)+' trades';
+const goal=d.goal||1;const cv=d.current?d.current.value:0;
+const pct=Math.min(100,Math.round((cv/goal)*100));
+document.getElementById('goalPct').textContent=pct;
+document.getElementById('goalValue').textContent=goal;
+document.getElementById('goalFill').style.width=pct+'%';
+document.getElementById('statTrades').textContent=d.trades_completed||0;
+document.getElementById('statMessages').textContent=d.messages_sent||0;
+document.getElementById('statDaysHeld').textContent=d.current?(d.current.days_held||0):0;
+document.getElementById('statListings').textContent=d.current&&d.current.listed_on?d.current.listed_on.length:0;
+const alerts=d.alerts||[];
+document.getElementById('alertCount').textContent=alerts.length;
+const aEl=document.getElementById('alertsContainer');
+if(!alerts.length){aEl.innerHTML='<div class="no-alerts">No alerts — AgentORP is quiet</div>'}
+else{aEl.innerHTML=alerts.map(a=>{const ic=ALERT_ICONS[a.type]||'📌';const t=a.time?new Date(a.time).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}):'';return'<div class="alert '+a.type+'"><span class="alert-icon">'+ic+'</span><span class="alert-text">'+a.message+'</span><span class="alert-time">'+t+'</span></div>'}).join('')}
+const cands=d.candidates||[];
+document.getElementById('candidateCount').textContent=cands.length;
+const cEl=document.getElementById('candidatesContainer');
+if(!cands.length){cEl.innerHTML='<div class="no-alerts">No candidates yet</div>'}
+else{cEl.innerHTML=cands.map(c=>{const sc=c.score>=80?'high':c.score>=60?'mid':'low';return'<div class="candidate"><div class="candidate-left"><div class="candidate-score '+sc+'">'+c.score+'</div><div class="candidate-name">'+c.item+'</div></div><div class="candidate-right"><div class="candidate-price">$'+c.price+'</div><div class="candidate-platform">'+c.platform+'</div></div></div>'}).join('')}
+const chEl=document.getElementById('chainContainer');
+if(!chain.length){chEl.innerHTML='<div class="empty"><div class="big">📎</div>Waiting for first item...</div>'}
+else{chEl.innerHTML=chain.map((t,i)=>{const isA=i===chain.length-1;const isO=i===0;const dc=isA?'active':isO?'origin':'';const nc=isA?'active':'';const conn=i<chain.length-1?'<div class="chain-connector"></div>':'';return'<div class="chain-node"><div class="chain-num '+nc+'">#'+t.number+'</div><div class="chain-dot '+dc+'"></div><div class="chain-info"><div class="chain-name">'+t.item+'</div><div class="chain-right"><div class="chain-price">$'+t.value+'</div>'+(t.gain_pct>0?'<div class="chain-pct">+'+t.gain_pct+'%</div>':'')+'</div></div></div>'+conn}).join('')}
+const acts=d.activity||[];
+document.getElementById('activityCount').textContent=acts.length;
+const actEl=document.getElementById('activityContainer');
+if(!acts.length){actEl.innerHTML='<div class="no-alerts">No activity yet</div>'}
+else{actEl.innerHTML=acts.map(a=>{const ic=ACTIVITY_ICONS[a.action]||'•';const t=a.time?new Date(a.time).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}):'';return'<div class="activity-item"><span class="activity-icon">'+ic+'</span><span class="activity-detail">'+a.detail+(a.platform?' <span style="color:var(--text-muted)">· '+a.platform+'</span>':'')+'</span><span class="activity-time">'+t+'</span></div>'}).join('')}
+document.getElementById('lastUpdated').textContent=d.updated?new Date(d.updated).toLocaleString():'never';
+}
+
+async function poll(){
+try{const r=await fetch('scoreboard.json?t='+Date.now());if(r.ok){const d=await r.json();render(d)}}catch(e){}
+}
+poll();
+setInterval(poll,POLL_INTERVAL);
+</script>
+</body>
+</html>
